@@ -1,0 +1,21 @@
+FROM microsoft/iis:windowsservercore-1709
+
+RUN powershell -NoProfile -Command \
+    Install-WindowsFeature NET-Framework-45-ASPNET ; \
+    Install-WindowsFeature Web-Asp-Net45
+
+
+
+ADD https://aka.ms/vs/15/release/VC_redist.x64.exe /vc_redist.x64.exe
+RUN C:\vc_redist.x64.exe /quiet /install
+
+RUN mkdir c:\site
+
+
+RUN powershell -NoProfile -Command \
+    Import-module IISAdministration; \
+    New-IISSite -Name "U4BW" -PhysicalPath C:\site -BindingInformation "*:8000:"
+
+EXPOSE 8000
+
+COPY content/ /site
